@@ -15,6 +15,7 @@ export const App = () => {
     e.preventDefault();
     if (!key) return alert("Room nomini kiriting");
     const msg = e.target.msg.value;
+    if (msg.lengtg < 2) return alert("Xabar kiriting");
     socket.emit("send-message", { room: key, msg, user });
     e.target.msg.value = "";
   };
