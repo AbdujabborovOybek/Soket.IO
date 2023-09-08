@@ -8,6 +8,7 @@ export const App = () => {
   const [messages, setMessages] = useState([]);
   const [key, setKey] = useState(null);
   const user = `User_${id}`;
+  document.querySelector("title").innerText = user;
 
   if (key) socket.emit("join-room", { room: key, user });
 
@@ -15,7 +16,7 @@ export const App = () => {
     e.preventDefault();
     if (!key) return alert("Room nomini kiriting");
     const msg = e.target.msg.value;
-    if (msg.lengtg < 2) return alert("Xabar kiriting");
+    if (msg.lengtg) return alert("Xabar kiriting");
     socket.emit("send-message", { room: key, msg, user });
     e.target.msg.value = "";
   };
