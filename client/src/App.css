@@ -20,6 +20,10 @@ form {
   gap: 20px;
 }
 
+form > :first-child {
+  width: 100px;
+}
+
 form > input {
   width: 320px;
   height: 45px;
@@ -36,6 +40,11 @@ form > button {
   border: none;
   border-radius: 5px;
   font-size: 16px;
+  cursor: pointer;
+}
+
+button:active {
+  transform: scale(0.98);
 }
 
 ol {

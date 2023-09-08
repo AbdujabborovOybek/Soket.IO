@@ -1,27 +1,50 @@
 const express = require("express");
-const http = require("http");
-const socketIo = require("socket.io");
 const port = process.env.PORT || 8080;
+const socketIo = require("socket.io");
+const http = require("http");
 
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
-// Soket.IO ni sozlash
+// Ulangan foydalanuvchilarni saqlash uchun obyekt
+const connectedUsers = {};
+
+// Roomga yuboriladigan xabarlar
+const roomMessages = {};
+
 io.on("connection", (socket) => {
-  console.log("New client connected");
+  // Foydalanuvchini qo'shish
+  socket.on("join-room", ({ user, room }) => {
+    // Foydalanuvchini roomga qo'shish
+    socket.join(room);
 
-  socket.on("/api/room", (data) => {
-    console.log("Message received: " + data);
-
-    // xabarni boshqa foydalanuvchilarga yuborish
-    socket.emit("/api/room", "Beckendga kelgan xabar => " + data);
+    // Foydalanuvchini saqlash
+    connectedUsers[socket.id] = { user, room };
+    console.log(`${user} joined: ${room}`);
   });
 
-  socket.on("/typing", (data) => {
-    // Tuyping bo'lganini boshqa foydalanuvchilarga yuborish
-    socket.emit("/typing", "typing...");
+  // Xabarlarni yuborish
+  socket.on("send-message", (data) => {
+    const room = data.room;
+
+    // Roomga xabar yuborish
+    socket.to(room).emit("receive-message", data);
+
+    // Roomga xabarlar saqlash
+    if (!roomMessages[room]) roomMessages[room] = [];
+    roomMessages[room].push(data);
+
+    // Roomdagi xabarlarni yuborish
+    socket.to(room).emit("receive-messages", roomMessages[room]);
   });
+
+  // Roomdagi xabarlarni olish
+  socket.on("get-messages", (room) => {
+    socket.emit("receive-messages", roomMessages[room] || []);
+  });
+
+  socket.on("disconnect", () => delete connectedUsers[socket.id]);
 });
 
-server.listen(port, () => console.log(`Server started on port: ${port}`));
+server.listen(port, () => console.log(`Listening on port ${port}`));
