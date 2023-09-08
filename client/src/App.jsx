@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import io from "socket.io-client";
 
-const socket = io("http://localhost:8080");
+const socket = io("https://chat-bot.pandashop.uz");
 const id = Math.floor(Math.random() * 1000);
 
 export const App = () => {
